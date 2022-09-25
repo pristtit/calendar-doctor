@@ -34,15 +34,18 @@
 
             <div class="hour-container">
                 <hour-item
-                    @click.stop="chooseHour( day + 7*(choosedWeek-1), hour-1 )"
-                    @click="sendCalendar( userStore.authData.id, choosed)"
+                    @click.stop="
+                        chooseHour( day + 7*(choosedWeek-1), hour-1 ),
+                        sendCalendar( userStore.authData.id, choosed)
+                    "
+                    :class="{ ch: test(String(hour-1), String(day)) }"
                     v-for="hour of 24"
                     :key="hour"
 
                     :day="day"
                     :hour="hour"
                     :choosed-week="choosedWeek"
-                    :choosed="choosed"
+                    :choosed="choosed[day + 7*(choosedWeek-1)]"
                 ></hour-item>
             </div>
             
@@ -55,40 +58,44 @@
 <script setup>
 import { useServer } from '@/stores/useServer';
 import { useUser } from '@/stores/useUser';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import HourItem from '@/components/hourItem.vue';
 import DateItem from '@/components/DateItem.vue';
 
 const userStore = useUser();
 const backEnd = useServer();
 
-const choosed = ref([]);
+const choosed = ref({});
 const choosedWeek = ref(1);
+
+const test = computed(() => function(h, d) {
+    return choosed.value[d]?.find(item => item.hour === +h)
+})
 
 const chooseHour = (day, hour) => {
     let arrIndex
-    choosed.value.forEach((item, index) => {
-        if (item.day === day && item.hour === hour) arrIndex = index;
+    choosed.value[day]?.forEach((item, index) => {
+        if (item.hour === hour) arrIndex = index;
     })
 
     if (arrIndex === undefined) {
-        if (choosed.value.find(item => item.day === day)) {
-            choosed.value.push({ day, hour });
+        if (choosed.value[day]?.length) {
+            choosed.value[day].push({ hour });
         } else {
-            choosed.value.push({ day, hour, isFirst: true, firstElement: true});
+            choosed.value[day] = [];
+            choosed.value[day].push({ hour, isFirst: true, firstElement: true});
             for (let index = 1; index < 4; index++) {
                 if (hour + index > 24) break
-                choosed.value.push({ day, hour: hour + index, isFirst: true });
+                choosed.value[day].push({ hour: hour + index, isFirst: true });
             }
         }
     } else {
-        if (choosed.value[arrIndex].isFirst) {
-            choosed.value = choosed.value.filter(item => !(item.day === day && item.isFirst));
+        if (choosed.value[day][arrIndex].isFirst) {
+            choosed.value[day] = choosed.value[day].filter(item => !item.isFirst);
         } else {
-            choosed.value = choosed.value.filter(item => !(item.day === day && item.hour === hour));
+            choosed.value[day] = choosed.value[day].filter(item => item.hour !== hour);
         }
     }
-
 }
 
 const changeWeek = (week) => {
@@ -99,6 +106,9 @@ let timer;
 const sendCalendar = (id, calendar) => {
     clearTimeout(timer);
     timer = setTimeout(() => {
+        Object.keys(calendar).forEach(item => {
+            calendar[item].sort((a, b) => a.hour - b.hour)
+        })
         backEnd.sendCalendar(id, calendar);
     }, 2_000);
 }
@@ -107,6 +117,10 @@ const sendCalendar = (id, calendar) => {
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Montserrat');
+
+.ch {
+    background-color: #000000;
+}
 .hour-container {
     display: flex;
     margin: 5px 0 20px 0;

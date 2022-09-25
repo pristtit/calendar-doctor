@@ -9,7 +9,7 @@ export const useServer = defineStore('server', {
                 login: '12345',
                 password: '12345',
                 name: 'Иван И.И.',
-                calendar: []
+                calendar: {}
             },
             {
                 _id: 6237612638,
@@ -17,7 +17,7 @@ export const useServer = defineStore('server', {
                 login: '123456',
                 password: '123456',
                 name: 'Петр П.П.',
-                calendar: []
+                calendar: {}
             },
             {
                 _id: 10879713901639,

@@ -18,27 +18,45 @@
         <div class="day__arrow-right" @click.stop="choosedWeek<4 ? choosedWeek++ : ''"></div>
     </div>
 
-    <div class="hour-container">
+    <div class="doctorList">
+        <div class="doctorList__name-container">
+            <div v-for="(doctor, index) of backEnd.schedule" :key="index">{{ doctor.name }}</div>
+        </div>
+        <div>
+            <div class="calendar-container">
                 <hour-item
                     v-for="hour of 24"
                     :key="hour"
-
+                    :class="{ 'hour-free': isHourFree }"
                     :hour="hour"
                 ></hour-item>
             </div>
+
+            <div class="calendar">
+
+            </div>
+        </div>
+    </div>
 </template>
 
 
 <script setup>
 import DateItem from '@/components/DateItem.vue';
 import HourItem from '@/components/hourItem.vue';
+import { useServer } from '@/stores/useServer';
 import { ref } from 'vue';
 const choosedWeek = ref(1);
 const choosedDay = ref(1);
+
+const backEnd = useServer();
+
+// const isHourFree = computed(() => {
+
+// })
 </script>
 
 
-<style>
+<style scoped>
 .hour-container {
     display: flex;
     position: absolute;
