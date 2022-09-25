@@ -1,5 +1,17 @@
-import { createApp } from 'vue'
-import App from './App.vue'
-import router from './router'
+import App from './App'
 
-createApp(App).use(router).mount('#app')
+import { createApp } from 'vue'
+import router from "@/router";
+import { createPinia } from 'pinia'
+
+import components from '@/components/Base';
+const app = createApp(App)
+
+components.forEach(component => {
+    app.component(component.name, component)
+})
+
+app
+    .use(router)
+    .use(createPinia())
+    .mount('#app');

@@ -1,30 +1,24 @@
 <template>
-  <nav>
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
-  </nav>
-  <router-view/>
+<div class="container">
+    <base-header></base-header>
+    <router-link to="/doctor">doctor</router-link>
+    <router-link to="/coordinator">coordinator</router-link>
+    <router-link to="/login">login</router-link>
+    <router-view/>
+</div>
+  
 </template>
+<script setup>
 
+
+</script>
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
+.container {
+    position: relative;
+    margin: auto;
+    width: 1440px;
+    height: 1154px;
 
-nav {
-  padding: 30px;
-}
-
-nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-nav a.router-link-exact-active {
-  color: #42b983;
+    background: #FFFFFF;
 }
 </style>
