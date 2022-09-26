@@ -1,9 +1,6 @@
 <template>
 <div class="container">
     <base-header></base-header>
-    <router-link to="/doctor">doctor</router-link>
-    <router-link to="/coordinator">coordinator</router-link>
-    <router-link to="/login">login</router-link>
     <router-view/>
 </div>
   

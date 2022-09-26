@@ -17,38 +17,12 @@
         <div class="date__arrow-right" @click.stop="choosedWeek<4 ? choosedWeek++ : ''"></div>
     </div>
 
-    <div class="calendar">
-        <div class="hour-container">
-            <div
-                class="hours"
-                v-for="hour of 24"
-                :key="hour"
-                :class="{ 'hour-free': isHourFree }"
-            >
-                {{ ("0" + (hour-1)).slice(-2) }}
-            </div>
-        </div>
-
-        <div class="line"></div>
-        
-        <div class="schedule-container">
-            <div class="schedule" v-for="(doctor, index) of backEnd.schedule" :key="index">
-                <div class="schedule__name">{{ doctor.name }}</div>
-                <div
-                    class="schedule__hours"
-                    v-for="hour of 24"
-                    :key="hour"
-                    :class="scheduleClass(doctor.calendar, hour-1, choosedDay)"
-                ></div>
-            </div>
-        </div>
-    </div>
-
     <table class="calendar">
         <thead>
             <tr>
-                <th></th>
+                <th class="calendar__date"></th>
                 <th
+                    class="calendar__date"
                     v-for="hour of 24"
                     :key="hour"
                     :class="{ 'hour-free': isHourFree }"
@@ -57,14 +31,18 @@
                 </th>
             </tr>
         </thead>
-        <tbody>
-            <tr v-for="(doctor, index) of backEnd.schedule" :key="index">
-                <td>{{ doctor.name }}</td>
+        <tbody class="calendar__body">
+            <tr class="calendar__line" v-for="(doctor, index) of backEnd.schedule" :key="index">
                 <td
+                    class="calendar__schedule-name"
+                    :class="{ 'calendar__schedule-first': index === 0 }"
+                    >{{ doctor.name }}</td>
+                <td
+                    class="calendar__schedule"
                     v-for="hour of 24"
                     :key="hour"
-                    :class="scheduleClass(doctor.calendar, hour-1, choosedDay)"
-                ></td>
+                    
+                ><div :class="scheduleClass(doctor.calendar, hour-1, choosedDay)"></div></td>
             </tr>
         </tbody>
     </table>
@@ -87,6 +65,7 @@ const backEnd = useServer();
 
 
 <style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Montserrat');
 .date-container {
     display: flex;
     position: absolute;
@@ -94,9 +73,6 @@ const backEnd = useServer();
     top: 99px;
     gap: 20px;
     cursor: pointer;
-}
-.date {
-
 }
 .date__arrow-left {
     box-sizing: border-box;
@@ -128,13 +104,68 @@ const backEnd = useServer();
 
 
 .calendar {
-    display: flex;
-    flex-direction: column;
     position: absolute;
     left: 150px;
     top: 186px;
     border: 1px solid red;
+    border-collapse: collapse;
 }
+.calendar__date {
+    border: 1px solid red;
+    height: 40px !important;
+}
+.calendar__line:hover {
+    background: #B5D9FD;
+    border-radius: 30px;
+    position: relative;
+    z-index: 100;
+}
+.calendar__schedule {
+    border-right: 1px solid red;
+    width: 40px;
+    position: relative;
+}
+.calendar__schedule-name {
+    
+    border-right: 1px solid red;
+    width: 196px;
+    padding-left: 29px;
+
+    font-family: 'Montserrat';
+font-style: normal;
+font-weight: 500;
+font-size: 12px;
+line-height: 150%;
+/* or 18px */
+
+display: flex;
+align-items: center;
+
+color: #000000;
+}
+.calendar__schedule-first {
+    padding-top: 29px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 .line {
     width: 100%;
     border-bottom: 1px solid #D1DCE5;
@@ -183,13 +214,21 @@ const backEnd = useServer();
 
 
 .choosed {
+    position: absolute;
+    z-index: 10;
     background: #47E69A;
+    height: 10px;
+    width: 44px;
+    left: -1px;
+    bottom: 5px;
 }
 .choosed_left-border {
-    border-radius: 10px 0 0 10px;
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
 }
 .choosed_right-border {
-    border-radius: 0 10px 10px 0;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
 }
 
 
