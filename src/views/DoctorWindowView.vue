@@ -2,7 +2,7 @@
     <div class="user-name-container">
         <div class="user-name__icon-1"></div>
         <div class="user-name__icon-2"></div>
-        <div class="user-name">{{ userStore.authData.name }}</div>
+        <div class="user-name">{{ userStore.authData?.name }}</div>
     </div>
 
     <div class="week-container">
@@ -33,20 +33,21 @@
             ></date-item>
 
             <div class="hour-container">
-                <hour-item
+                <div
+                    class="hours"
+                    :class="{
+                        choosed: isHourChoosed(choosed, hour-1, day),
+                        firstElement: isFirstElement(choosed, hour-1, day)
+                    }"
                     @click.stop="
                         chooseHour( day + 7*(choosedWeek-1), hour-1 ),
                         sendCalendar( userStore.authData.id, choosed)
                     "
-                    :class="{ ch: test(String(hour-1), String(day)) }"
                     v-for="hour of 24"
                     :key="hour"
-
-                    :day="day"
-                    :hour="hour"
-                    :choosed-week="choosedWeek"
-                    :choosed="choosed[day + 7*(choosedWeek-1)]"
-                ></hour-item>
+                >
+                    {{ ("0" + (hour-1)).slice(-2) }}
+                </div>
             </div>
             
         </div>
@@ -58,9 +59,9 @@
 <script setup>
 import { useServer } from '@/stores/useServer';
 import { useUser } from '@/stores/useUser';
-import { computed, ref } from 'vue';
-import HourItem from '@/components/hourItem.vue';
+import { ref } from 'vue';
 import DateItem from '@/components/DateItem.vue';
+import useHoursClass from '@/hooks/useHoursClass';
 
 const userStore = useUser();
 const backEnd = useServer();
@@ -68,9 +69,7 @@ const backEnd = useServer();
 const choosed = ref({});
 const choosedWeek = ref(1);
 
-const test = computed(() => function(h, d) {
-    return choosed.value[d]?.find(item => item.hour === +h)
-})
+const { isHourChoosed, isFirstElement } = useHoursClass()
 
 const chooseHour = (day, hour) => {
     let arrIndex
@@ -92,8 +91,10 @@ const chooseHour = (day, hour) => {
     } else {
         if (choosed.value[day][arrIndex].isFirst) {
             choosed.value[day] = choosed.value[day].filter(item => !item.isFirst);
+            if ( !choosed.value[day].length ) delete choosed.value[day];
         } else {
             choosed.value[day] = choosed.value[day].filter(item => item.hour !== hour);
+            if ( !choosed.value[day].length ) delete choosed.value[day];
         }
     }
 }
@@ -115,11 +116,33 @@ const sendCalendar = (id, calendar) => {
 </script>
 
 
-<style>
+<style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Montserrat');
 
-.ch {
-    background-color: #000000;
+.hours {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 48px;
+    height: 40px;
+    box-sizing: border-box;
+    border: 1px solid #D1DCE5;
+    font-family: 'Montserrat';
+    font-style: normal;
+    font-weight: 500;
+    font-size: 12px;
+    line-height: 150%;
+    color: #636363;
+}
+.hours:hover {
+    cursor: pointer;
+}
+.choosed {
+    background: #73AEEA;
+    color: #FFFFFF;
+}
+.firstElement {
+    background: #2D87E2;
 }
 .hour-container {
     display: flex;

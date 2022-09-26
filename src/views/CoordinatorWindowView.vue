@@ -1,10 +1,9 @@
 <template>
-    <div>Координатор</div>
-    <div class="day-container" @click.stop="choosedWeek>1 ? choosedWeek-- : ''">
-        <div class="day__arrow-left"></div>
+    <div class="date-container" @click.stop="choosedWeek>1 ? choosedWeek-- : ''">
+        <div class="date__arrow-left"></div>
 
          <date-item
-            class="day"
+            class="date"
             v-for="day of 7"
             :key="day"
             :class="{ choosedDay: choosedDay === day + 7*(choosedWeek-1) }"
@@ -15,55 +14,80 @@
             :dayNameShow="true"
         ></date-item>
 
-        <div class="day__arrow-right" @click.stop="choosedWeek<4 ? choosedWeek++ : ''"></div>
+        <div class="date__arrow-right" @click.stop="choosedWeek<4 ? choosedWeek++ : ''"></div>
     </div>
 
-    <div class="doctorList">
-        <div class="doctorList__name-container">
-            <div v-for="(doctor, index) of backEnd.schedule" :key="index">{{ doctor.name }}</div>
+    <div class="calendar">
+        <div class="hour-container">
+            <div
+                class="hours"
+                v-for="hour of 24"
+                :key="hour"
+                :class="{ 'hour-free': isHourFree }"
+            >
+                {{ ("0" + (hour-1)).slice(-2) }}
+            </div>
         </div>
-        <div>
-            <div class="calendar-container">
-                <hour-item
+
+        <div class="line"></div>
+        
+        <div class="schedule-container">
+            <div class="schedule" v-for="(doctor, index) of backEnd.schedule" :key="index">
+                <div class="schedule__name">{{ doctor.name }}</div>
+                <div
+                    class="schedule__hours"
+                    v-for="hour of 24"
+                    :key="hour"
+                    :class="scheduleClass(doctor.calendar, hour-1, choosedDay)"
+                ></div>
+            </div>
+        </div>
+    </div>
+
+    <table class="calendar">
+        <thead>
+            <tr>
+                <th></th>
+                <th
                     v-for="hour of 24"
                     :key="hour"
                     :class="{ 'hour-free': isHourFree }"
-                    :hour="hour"
-                ></hour-item>
-            </div>
-
-            <div class="calendar">
-
-            </div>
-        </div>
-    </div>
+                >
+                    {{ ("0" + (hour-1)).slice(-2) }}
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr v-for="(doctor, index) of backEnd.schedule" :key="index">
+                <td>{{ doctor.name }}</td>
+                <td
+                    v-for="hour of 24"
+                    :key="hour"
+                    :class="scheduleClass(doctor.calendar, hour-1, choosedDay)"
+                ></td>
+            </tr>
+        </tbody>
+    </table>
 </template>
 
 
 <script setup>
 import DateItem from '@/components/DateItem.vue';
-import HourItem from '@/components/hourItem.vue';
+import useHoursClass from '@/hooks/useHoursClass';
 import { useServer } from '@/stores/useServer';
 import { ref } from 'vue';
+
 const choosedWeek = ref(1);
 const choosedDay = ref(1);
+const {scheduleClass} = useHoursClass();
 
 const backEnd = useServer();
 
-// const isHourFree = computed(() => {
-
-// })
 </script>
 
 
 <style scoped>
-.hour-container {
-    display: flex;
-    position: absolute;
-    left: 345px;
-    top: 186px;
-}
-.day-container {
+.date-container {
     display: flex;
     position: absolute;
     left: 228px;
@@ -71,11 +95,10 @@ const backEnd = useServer();
     gap: 20px;
     cursor: pointer;
 }
-.day_margin {
-    margin-right: 9px;
-}
+.date {
 
-.day__arrow-left {
+}
+.date__arrow-left {
     box-sizing: border-box;
 
     width: 32px;
@@ -88,7 +111,7 @@ const backEnd = useServer();
     background-repeat: no-repeat;
     background-position: center;
 }
-.day__arrow-right {
+.date__arrow-right {
     box-sizing: border-box;
 
     width: 32px;
@@ -102,6 +125,79 @@ const backEnd = useServer();
     background-position: center;
     transform: rotate(180deg);
 }
+
+
+.calendar {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    left: 150px;
+    top: 186px;
+    border: 1px solid red;
+}
+.line {
+    width: 100%;
+    border-bottom: 1px solid #D1DCE5;
+    position: relative;
+    top: -1px;
+}
+
+
+.hour-container {
+    display: flex;
+    align-self: flex-end;
+}
+.hours {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 48px;
+    height: 40px;
+    box-sizing: border-box;
+    border: 1px solid #D1DCE5;
+    font-family: 'Montserrat';
+    font-style: normal;
+    font-weight: 500;
+    font-size: 12px;
+    line-height: 150%;
+    color: #636363;
+}
+
+
+.schedule-container {
+    display: flex;
+    flex-direction: column;
+    padding: 29px 0 0 29px;
+    gap: 10px;
+}
+.schedule {
+    display: flex;
+}
+.schedule__name {
+    width: 196px;
+}
+.schedule__hours {
+    height: 10px;
+    width: 48px;
+}
+
+
+.choosed {
+    background: #47E69A;
+}
+.choosed_left-border {
+    border-radius: 10px 0 0 10px;
+}
+.choosed_right-border {
+    border-radius: 0 10px 10px 0;
+}
+
+
+.day_margin {
+    margin-right: 9px;
+}
+
+
 .choosedDay {
     background-color: #73AEEA;
 }

@@ -31,7 +31,7 @@ export const useServer = defineStore('server', {
 
     getters: {
         schedule: (state) => {
-            return state._usersAuthData.map(item => {
+            return state._usersAuthData.filter(item => item.role === 'doctor').map(item => {
                 if (item.role === 'doctor') return {name: item.name, calendar: item.calendar}
             })
         }
