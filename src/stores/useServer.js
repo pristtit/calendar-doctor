@@ -31,28 +31,30 @@ export const useServer = defineStore('server', {
 
     getters: {
         schedule: (state) => {
-            return state._usersAuthData.filter(item => item.role === 'doctor').map(item => {
-                if (item.role === 'doctor') return {name: item.name, calendar: item.calendar}
+            const doctorList = [];
+            state._usersAuthData.forEach(item => {
+                if (item.role === 'doctor' && Object.keys(item.calendar).length) {
+                    doctorList.push({name: item.name, calendar: item.calendar})
+                }
             })
+            return doctorList
         }
     },
 
     actions: {
         userRole(authInfo) {
-            const user = this._usersAuthData.find(item => {
-                if (item.login === authInfo.login && item.password === authInfo.password) return true
-            })
+            const user = this._usersAuthData.find(item => item.login === authInfo.login && item.password === authInfo.password)
             if (user) {
-                return { role: user.role, id: user._id, name: user.name }
+                return { role: user.role, name: user.name }
             } else {
                 return false
             }
         },
 
-        sendCalendar(id, calendar) {
+        sendCalendar(name, calendar) {
             let user;
 
-            if ( (user = this._usersAuthData.find(item => item._id === id)) ) {
+            if ( (user = this._usersAuthData.find(item => item.name === name)) ) {
                 user.calendar = calendar;
                 return true;
             } else {

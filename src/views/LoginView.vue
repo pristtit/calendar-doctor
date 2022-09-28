@@ -1,7 +1,7 @@
 <template>
     <base-login
         class="login"
-        @Login="LoginIn"
+        @login="LoginIn"
     >
         <h3>Авторизация</h3>
     </base-login>

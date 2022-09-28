@@ -16,6 +16,9 @@
     width: 1440px;
     height: 1154px;
 
-    background: #FFFFFF;
+    font-family: 'Montserrat';
+    font-style: normal;
+    font-weight: 500;
+    line-height: 150%;
 }
 </style>
