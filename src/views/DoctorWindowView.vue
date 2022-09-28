@@ -2,7 +2,7 @@
     <div class="user-name-container">
         <div class="user-name__icon-1"></div>
         <div class="user-name__icon-2"></div>
-        <div class="user-name">{{ userStore.authData.name }}</div>
+        <div class="user-name">{{ userStore.authData?.name }}</div>
     </div>
 
     <div class="week-container">
@@ -11,7 +11,7 @@
             :key="week"
             @click="changeWeek(week)"
             class="week"
-            :class="{ choosedWeek: choosedWeek === week }"
+            :class="{ week_black: choosedWeek === week }"
         >
             <date-item class="weeks__date" :day="(week-1)*7"></date-item>
             <date-item :day="week*7-1"></date-item>
@@ -33,17 +33,21 @@
             ></date-item>
 
             <div class="hour-container">
-                <hour-item
-                    @click.stop="chooseHour( day + 7*(choosedWeek-1), hour-1 )"
-                    @click="sendCalendar( userStore.authData.id, choosed)"
+                <div
+                    class="hour"
+                    :class="{
+                        'hour_blue': isHourChoosed(choosed, hour-1, day + 7*(choosedWeek-1)),
+                        'hour_dark-blue': isFirstElement(choosed, hour-1, day + 7*(choosedWeek-1))
+                    }"
+                    @click.stop="
+                        chooseHour( day + 7*(choosedWeek-1), hour-1, choosed ),
+                        sendCalendar( userStore.authData.name, choosed)
+                    "
                     v-for="hour of 24"
                     :key="hour"
-
-                    :day="day"
-                    :hour="hour"
-                    :choosed-week="choosedWeek"
-                    :choosed="choosed"
-                ></hour-item>
+                >
+                    {{ ("0" + (hour-1)).slice(-2) }}
+                </div>
             </div>
             
         </div>
@@ -53,60 +57,50 @@
 
 
 <script setup>
-import { useServer } from '@/stores/useServer';
 import { useUser } from '@/stores/useUser';
 import { ref } from 'vue';
-import HourItem from '@/components/hourItem.vue';
 import DateItem from '@/components/DateItem.vue';
+import useHoursClass from '@/hooks/useHoursClass';
+import useChooseHour from "@/hooks/useChooseHour";
 
 const userStore = useUser();
-const backEnd = useServer();
 
-const choosed = ref([]);
+const choosed = ref({});
 const choosedWeek = ref(1);
 
-const chooseHour = (day, hour) => {
-    let arrIndex
-    choosed.value.forEach((item, index) => {
-        if (item.day === day && item.hour === hour) arrIndex = index;
-    })
-
-    if (arrIndex === undefined) {
-        if (choosed.value.find(item => item.day === day)) {
-            choosed.value.push({ day, hour });
-        } else {
-            choosed.value.push({ day, hour, isFirst: true, firstElement: true});
-            for (let index = 1; index < 4; index++) {
-                if (hour + index > 24) break
-                choosed.value.push({ day, hour: hour + index, isFirst: true });
-            }
-        }
-    } else {
-        if (choosed.value[arrIndex].isFirst) {
-            choosed.value = choosed.value.filter(item => !(item.day === day && item.isFirst));
-        } else {
-            choosed.value = choosed.value.filter(item => !(item.day === day && item.hour === hour));
-        }
-    }
-
-}
+const { isHourChoosed, isFirstElement } = useHoursClass();
+const { chooseHour, sendCalendar } = useChooseHour();
 
 const changeWeek = (week) => {
     choosedWeek.value = week;
 }
-
-let timer;
-const sendCalendar = (id, calendar) => {
-    clearTimeout(timer);
-    timer = setTimeout(() => {
-        backEnd.sendCalendar(id, calendar);
-    }, 2_000);
-}
 </script>
 
 
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Montserrat');
+<style scoped>
+.hour {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    width: 48px;
+    height: 40px;
+    box-sizing: border-box;
+    border: 1px solid #D1DCE5;
+
+    font-size: 12px;
+    color: #636363;
+}
+.hour:hover {
+    cursor: pointer;
+}
+.hour_blue {
+    background: #73AEEA;
+    color: #FFFFFF;
+}
+.hour_dark-blue {
+    background: #2D87E2;
+}
 .hour-container {
     display: flex;
     margin: 5px 0 20px 0;
@@ -116,12 +110,8 @@ const sendCalendar = (id, calendar) => {
     position: absolute;
     left: 174px;
     top: 109px;
-    font-family: 'Montserrat';
-    font-style: normal;
     font-weight: 400;
     font-size: 20px;
-    line-height: 150%;
-    color: #000000;
 }
 .user-name__icon-1 {
     position: absolute;
@@ -145,6 +135,7 @@ const sendCalendar = (id, calendar) => {
     position: absolute;
     left: 150px;
     top: 176px;
+
     display: flex;
     gap: 38px;
     cursor: pointer;
@@ -157,9 +148,6 @@ const sendCalendar = (id, calendar) => {
     margin: 0 5px 0 5px;
 }
 .week {
-    font-family: 'Montserrat';
-    font-style: normal;
-    font-weight: 500;
     font-size: 18px;
     line-height: 18px;
 
@@ -180,7 +168,7 @@ left: 150px;
 top: 230px;
 }
 
-.choosedWeek {
+.week_black {
     color: #233B4C;
 }
 
@@ -189,11 +177,7 @@ top: 230px;
     height: 18px;
     gap: 9px;
 
-    font-family: 'Montserrat';
-    font-style: normal;
-    font-weight: 500;
     font-size: 12px;
-    line-height: 150%;
     color: #636363;
 }
 .day__date_color {

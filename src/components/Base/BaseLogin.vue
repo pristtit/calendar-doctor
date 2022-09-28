@@ -43,7 +43,7 @@ export default {
 
     methods: {
         Login() {
-            this.$emit('Login', this.authInfo)
+            this.$emit('login', this.authInfo)
             this.authInfo = {
                 login: '',
                 password: '',

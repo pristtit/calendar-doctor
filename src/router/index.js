@@ -32,9 +32,14 @@ const router = createRouter({
 })
 
 router.beforeEach((to) => {
-  if ( to.meta.role && !(JSON.parse(localStorage.getItem('userAuthData')).role === to.meta.role) ) {
+  if ( to.meta.role && !(JSON.parse(localStorage.getItem('userAuthData'))?.role === to.meta.role) ) {
     return {
       path: '/login',
+    }
+  }
+  else if ( to.name === 'login' && JSON.parse(localStorage.getItem('userAuthData'))?.role ) {
+    return {
+      path: `/${JSON.parse(localStorage.getItem('userAuthData')).role}`,
     }
   }
 })

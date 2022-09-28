@@ -1,7 +1,7 @@
 <template>
 <div class="date">
-    <div :class="dayMonthClass" class="date__day-month">{{ getDateFormat(props.day) }}</div>
-    <div :class="dayNameClass" v-if="dayNameShow" class="date__day-name">{{ getWeekDay(props.day) }}</div>
+    <div :class="dayMonthClass">{{ getDateFormat(props.day) }}</div>
+    <div v-if="dayNameShow" :class="dayNameClass">{{ getWeekDay(props.day) }}</div>
 </div>
 </template>
 
@@ -57,5 +57,6 @@ const getWeekDay = (days) => {
 <style scoped>
 .date {
     display: flex;
+    gap: 8px;
 }
 </style>

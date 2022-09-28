@@ -83,5 +83,12 @@ export default {
     position: absolute;
     align-self: center;
     right: 0px;
+
+    border: 1px solid #E3EFF9;
+    border-radius: 12px;
+}
+.logo__btn-out:hover {
+    background: #73AEEA;
+    color: #FFFFFF;
 }
 </style>
